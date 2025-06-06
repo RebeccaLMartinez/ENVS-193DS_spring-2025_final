@@ -1,7 +1,30 @@
 ---
-title: "ENVS-193DS_final"
+title: "ENVS-193DS Final"
 author: "Rebecca Martinez"
+date: "June 12, 2025"
 format: html
 ---
 
 💻 [**GitHub Repository**](https://github.com/RebeccaLMartinez/ENVS-193DS_spring-2025_final)
+
+```{r setup, eval=FALSE}
+
+# packages used
+
+library(tidyverse)
+
+
+
+
+```
+
+# Problem 1. Research writing 
+
+## a. Transparent statistical methods
+
+**In part 1**, my co-worker most likely used Pearson’s correlation test. This test evaluates whether there is a linear relationship between two continuous variables—in this case, distance from headwater (km) and annual total nitrogen load (kg/year). The reported p-value of 0.03 indicates that the relationship is statistically significant.
+
+**In part 2**, they probably used analysis of variance (ANOVA) to test for differences in average nitrogen load among the five sources (urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands). ANOVA is the appropriate test to compare means across multiple groups, and the p-value of 0.02 shows there is a significant difference between at least some of the groups.
+
+Because no other details were provided (like regression results or additional test statistics), these are the most likely tests based on the language and p-values reported.
+
