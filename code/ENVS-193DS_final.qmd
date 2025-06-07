@@ -11,20 +11,40 @@ format: html
 
 # packages used
 
-library(tidyverse)
+library(tidyverse) # general use
+library(here) # file organization
+library(janitor) # cleaning data frames
+library(readxl) # reading excel files
+library(scales) # modifying axis labels
+library(ggeffects) # getting model predictions
+library(MuMIn) # model selection
 
-
-
-
+sst <- read_csv(here("data", "sst_update2023.csv"))
 ```
 
 # Problem 1. Research writing 
 
-## a. Transparent statistical methods
+## a. Transparent statistical methods  
 
-**In part 1**, my co-worker most likely used Pearson’s correlation test. This test evaluates whether there is a linear relationship between two continuous variables—in this case, distance from headwater (km) and annual total nitrogen load (kg/year). The reported p-value of 0.03 indicates that the relationship is statistically significant.
+**In part 1**, a linear regression test was likely used because both distance from headwater and nitrogen load are continuous variables. The p-value of 0.03 indicates that the slope of the relationship between distance and nitrogen load is significantly different from zero, meaning there is a statistically significant association between these variables. **In part 2**, average nitrogen loads across five different sources (urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands), which suggests they used a one-way ANOVA, the standard method for comparing means across multiple categorical groups. The p-value of 0.02 indicates at least one group mean differs significantly from the others.  
 
-**In part 2**, they probably used analysis of variance (ANOVA) to test for differences in average nitrogen load among the five sources (urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands). ANOVA is the appropriate test to compare means across multiple groups, and the p-value of 0.02 shows there is a significant difference between at least some of the groups.
+Because no other details were provided, these are the most likely tests based on the language and p-values reported.  
 
-Because no other details were provided (like regression results or additional test statistics), these are the most likely tests based on the language and p-values reported.
+## b. More information needed  
 
+The test in part 2 looks like an ANOVA, which is good for comparing nitrogen load across sources. But to give more context, my co-worker should add these two things:
+
+1. **Post-hoc test (like Tukey’s HSD)**. ANOVA tells us that at least one group is different, but not which ones. A post-hoc test helps identify which specific sources differ. 
+
+2. **Assumptions checks (like Shapiro-Wilk for normality  and Levene’s test for equal variance)**. ANOVA assumes the nitrogen load data is normally distributed within each group and that the variances are similar. Checking this helps make sure the ANOVA results are valid. If the assumptions aren’t met, a different test like Kruskal-Wallis might be better.
+
+Adding these steps would improve the strength of the conclusions and lower the chance of drawing the wrong conclusions from the data.
+
+## c. Suggestions for rewriting 
+
+
+
+
+
+
+# Problem 2
