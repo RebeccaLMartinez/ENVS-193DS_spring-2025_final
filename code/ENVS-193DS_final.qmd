@@ -7,19 +7,25 @@ format: html
 
 💻 [**GitHub Repository**](https://github.com/RebeccaLMartinez/ENVS-193DS_spring-2025_final)
 
-```{r setup, eval=FALSE}
+```{r setup,  message=FALSE, warning=FALSE, error=FALSE}
 
-# packages used
+# --- necessary packages (possibly more) ---
 
-library(tidyverse) # general use
-library(here) # file organization
-library(janitor) # cleaning data frames
-library(readxl) # reading excel files
-library(scales) # modifying axis labels
-library(ggeffects) # getting model predictions
-library(MuMIn) # model selection
+library(tidyverse)   # General data manipulation and visualization
+library(here)        # Simplifies file path management
+library(janitor)     # Helpful functions to clean data frames
+library(readxl)      # Read Excel files
+library(scales)      # Customize axis labels in plots
+library(ggeffects)   # Generate model predictions for plotting
+library(flextable)   # Create polished tables for reports
+library(rstatix)     # Easy statistical tests
+library(effectsize)  # Calculate effect sizes for models
+library(lubridate)   # Simplifies working with dates
 
-sst <- read_csv(here("data", "sst_update2023.csv"))
+# --- sea surface temperature data ---
+
+sst <- read_csv(here("data", "sst_update2023.csv"))  # SST data CSV file
+
 ```
 
 # Problem 1. Research writing 
@@ -48,3 +54,48 @@ Adding these steps would improve the strength of the conclusions and lower the c
 
 
 # Problem 2
+
+Below you can find code to clean and summarize the 'sst' data set:
+
+```{r cleaning data}
+
+
+sst_clean <- sst |> # new df using sst data
+  # Convert data types
+  mutate(
+    date = as.Date(date, format = "%Y-%m-%d"),   # Format date as YYYY-MM-DD
+    site = as.character(site),                   # Make site a character
+    latitude = as.numeric(latitude),             # Make latitude numeric
+    longitude = as.numeric(longitude),           # Make longitude numeric
+    temp = as.numeric(temp)                      # Make temp numeric
+  ) |>
+
+  # Create year and month columns
+  mutate(
+    year = factor(format(date, "%Y"), levels = as.character(2018:2023)),  # Year as factor
+    month = factor(format(date, "%b"), levels = month.abb, ordered = TRUE)  # Ordered month names
+  ) |>
+ drop_na() |>  # Remove rows with any missing values
+
+  group_by(year, month) |>  # Group data by year and month
+
+  summarise(
+    mean_monthly_sst = mean(temp),  # Calculate mean temp for each group
+    .groups = "drop"                # Ungroup after summarizing
+  )
+
+```
+
+
+```{r data structure}
+
+slice_sample(
+  sst_clean,
+  n = 5)
+
+str(sst_clean)
+
+
+
+```
+
