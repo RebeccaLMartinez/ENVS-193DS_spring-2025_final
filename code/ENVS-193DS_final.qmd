@@ -245,5 +245,33 @@ plot(sim_res3)                                        # plot diagnostics for edg
 ```
 
 
+## e. Select the best model
+
+
+```{r AIC}
+
+# Calculate AIC for each model
+aic_values <- AIC(model0,
+                  model1, 
+                  model2, 
+                  model3)
+
+# Print AIC table sorted by AIC (lowest first)
+aic_values <- aic_values[order(aic_values$AIC), ]
+print(aic_values)
+
+```
+
+```{r summary or model1}
+
+# Show summary of best model
+summary(model1)
+
+```
+
+**Interpretation**
+
+The best model, based on Akaike’s Information Criterion (AIC), includes both season and distance from the forest edge (model1) as predictors of Swift Parrot nest box occupancy. This model provides the best balance of signal (meaningful information) to noise (random variation).
+
 
 

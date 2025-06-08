@@ -103,6 +103,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#e.-run-the-models" id="toc-e.-run-the-models" class="nav-link" data-scroll-target="#e.-run-the-models">e. Run the models</a></li>
   <li><a href="#f.-check-the-diagnostics" id="toc-f.-check-the-diagnostics" class="nav-link" data-scroll-target="#f.-check-the-diagnostics">f.&nbsp;Check the diagnostics</a></li>
+  <li><a href="#e.-select-the-best-model" id="toc-e.-select-the-best-model" class="nav-link" data-scroll-target="#e.-select-the-best-model">e. Select the best model</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -291,11 +292,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 5 × 3
   year  month mean_monthly_sst
   &lt;fct&gt; &lt;ord&gt;            &lt;dbl&gt;
-1 2021  Apr               13.1
-2 2019  Feb               14.1
-3 2019  May               14.3
-4 2021  Sep               17.1
-5 2023  Sep               18.4</code></pre>
+1 2019  Jun               15.8
+2 2023  Dec               16.1
+3 2019  Dec               15.0
+4 2019  Feb               14.1
+5 2018  Mar               13.5</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sst_clean) <span class="co"># View structure of new df</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -488,6 +489,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+<section id="e.-select-the-best-model" class="level2">
+<h2 class="anchored" data-anchor-id="e.-select-the-best-model">e. Select the best model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate AIC for each model</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>aic_values <span class="ot">&lt;-</span> <span class="fu">AIC</span>(model0,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                  model1, </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                  model2, </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                  model3)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print AIC table sorted by AIC (lowest first)</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>aic_values <span class="ot">&lt;-</span> aic_values[<span class="fu">order</span>(aic_values<span class="sc">$</span>AIC), ]</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(aic_values)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       df      AIC
+model1  3 226.2057
+model3  2 229.6180
+model2  2 236.3208
+model0  1 238.8140</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show summary of best model</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = swift_parrot ~ season + edge_distance, family = "binomial", 
+    data = nest_boxes_clean)
+
+Coefficients:
+                Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)   -0.0774902  0.3293209  -0.235 0.813974    
+season2019    -0.7791985  0.3390296  -2.298 0.021544 *  
+edge_distance -0.0020782  0.0006226  -3.338 0.000843 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 236.81  on 226  degrees of freedom
+Residual deviance: 220.21  on 224  degrees of freedom
+AIC: 226.21
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p><strong>Interpretation</strong></p>
+<p>The best model, based on Akaike’s Information Criterion (AIC), includes both season and distance from the forest edge (model1) as predictors of Swift Parrot nest box occupancy. This model provides the best balance of signal (meaningful information) to noise (random variation).</p>
 </section>
 </section>
 
