@@ -187,10 +187,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 5 × 3
   year  month mean_monthly_sst
   &lt;fct&gt; &lt;ord&gt;            &lt;dbl&gt;
-1 2021  Jun               15.9
-2 2021  May               14.4
-3 2020  Oct               19.0
-4 2023  Oct               17.4
+1 2021  Feb               13.1
+2 2023  Dec               16.1
+3 2020  Jun               15.9
+4 2019  Mar               13.6
 5 2019  Aug               17.0</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sst_clean) <span class="co"># View structure of new df</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -231,6 +231,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="problem-3.-data-analysis" class="level1">
+<h1>Problem 3. Data analysis</h1>
+<p><strong>Research Questions</strong></p>
+<ol type="1">
+<li><p>How do year (2016 or 2019) and distance from forest edge predict Swift Parrot (Lathamus discolor) nest box occupancy?</p></li>
+<li><p>Is there a simpler model that explains Swift Parrot nest box occupancy, and if so, what is it?</p></li>
+</ol>
+<section id="a.-response-variable" class="level2">
+<h2 class="anchored" data-anchor-id="a.-response-variable">a. Response variable</h2>
+<p>A ‘1’ indicates that a nest box was occupied by a bird species during the observation period, meaning there was evidence such as adults, eggs, or nestlings. A ‘0’ means the nest box was not occupied or showed no signs of nesting when checked.</p>
+</section>
+<section id="b.-purpose-of-study" class="level2">
+<h2 class="anchored" data-anchor-id="b.-purpose-of-study">b. Purpose of study</h2>
+<p>The study focuses on the Swift Parrot, a critically endangered target species for which the nest boxes were deployed to aid conservation. In contrast, Common Starlings and Tree Martins are competitor species whose use of the boxes may reduce nesting opportunities for Swift Parrots, potentially undermining conservation efforts.</p>
+</section>
+<section id="c.-difference-in-seasons" class="level2">
+<h2 class="anchored" data-anchor-id="c.-difference-in-seasons">c.&nbsp;Difference in “seasons”</h2>
+<p>The two “seasons” refer to the years 2016 and 2019, representing the initial deployment of newly installed nest boxes and a later time point when the boxes had been established for several years. The study compares these seasons to examine how nest box use and species interactions may change over time as birds become familiar with the boxes.</p>
 </section>
 </section>
 

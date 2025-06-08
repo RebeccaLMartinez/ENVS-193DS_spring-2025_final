@@ -126,6 +126,25 @@ ggplot(sst_clean, aes(x = month, y = mean_monthly_sst, group = factor(year), col
 ```
 
 
+# Problem 3. Data analysis
+
+**Research Questions**
+
+1. How do year (2016 or 2019) and distance from forest edge predict Swift Parrot (Lathamus discolor) nest box occupancy?
+
+2. Is there a simpler model that explains Swift Parrot nest box occupancy, and if so, what is it?
+
+## a. Response variable 
+
+A '1' indicates that a nest box was occupied by a bird species during the observation period, meaning there was evidence such as adults, eggs, or nestlings. A '0' means the nest box was not occupied or showed no signs of nesting when checked.
+
+## b. Purpose of study
+
+The study focuses on the Swift Parrot, a critically endangered target species for which the nest boxes were deployed to aid conservation. In contrast, Common Starlings and Tree Martins are competitor species whose use of the boxes may reduce nesting opportunities for Swift Parrots, potentially undermining conservation efforts.
+
+## c. Difference in “seasons” 
+
+The two “seasons” refer to the years 2016 and 2019, representing the initial deployment of newly installed nest boxes and a later time point when the boxes had been established for several years. The study compares these seasons to examine how nest box use and species interactions may change over time as birds become familiar with the boxes.
 
 
 
