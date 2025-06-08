@@ -2,7 +2,11 @@
 title: "ENVS-193DS Final"
 author: "Rebecca Martinez"
 date: "June 12, 2025"
-format: html
+format:
+  html: 
+    toc: true 
+    warning: false 
+    message: false 
 ---
 
 💻 [**GitHub Repository**](https://github.com/RebeccaLMartinez/ENVS-193DS_spring-2025_final)
@@ -22,12 +26,24 @@ library(flextable)   # Creates tables
 library(rstatix)     # Easy statistical tests
 library(effectsize)  # Calculate effect sizes
 library(lubridate)   # To work with dates
-library(paletteer)  # Color package
+library(paletteer)   # Color package
+library(DHARMa)
+library(MuMIn)  # model selection (be advisedL Warning message: package ‘MuMIn’ was built under R version 4.3.3 )
+
 
 # --- sea surface temperature data ---
 
 sst <- read_csv(here("data", "sst_update2023.csv"))  # SST data CSV file
 
+str(sst)
+
+# --- 
+
+nest_boxes <- read_csv(here("data", "occdist.csv"))
+
+str(nest_boxes)
+slice(nest_boxes)
+head(nest_boxes)
 ```
 
 # Problem 1. Research writing 
@@ -58,7 +74,7 @@ The test in part 2 looks like an ANOVA, which is good for comparing nitrogen loa
 
 Below you can find code to clean and summarize the 'sst' data set:
 
-```{r cleaning data}
+```{r cleaning sst data}
 
 
 sst_clean <- sst |> # new df using sst data
@@ -147,14 +163,37 @@ The study focuses on the Swift Parrot, a critically endangered target species fo
 The two “seasons” refer to the years 2016 and 2019, representing the initial deployment of newly installed nest boxes and a later time point when the boxes had been established for several years. The study compares these seasons to examine how nest box use and species interactions may change over time as birds become familiar with the boxes.
 
 
+## d. Table of models
 
 
+### Model Table
+
+| Model Number | Season | Distance to Forest Edge | Predictor List                      |
+|--------------|--------|-------------------------|-------------------------------------|
+| 0            |        |                         | No predictors (null model)          |
+| 1            |   X    |            X            | All predictors (saturated model)    |
+| 2            |   X    |                         | Season only                         |
+| 3            |        |            X            | Distance to forest edge only        |
 
 
+## e. Run the models 
 
+```{r, cleaning nest_box data}
 
+nest_boxes_clean <- nest_boxes |> 
+  clean_names() |> 
+  rename(
+    swift_parrot = sp,
+    common_starling = cs,
+    tree_martin = tm,
+    empty = e
+  ) |> 
+  mutate(
+    season = as.factor(season),   # make season a factor
+    season = fct_relevel(season, "2016"), # reorder levels if needed
+    swift_parrot = as.integer(swift_parrot) # ensure response is integer 0/1
+  ) |> 
+  select(swift_parrot, season, edge_distance)
 
-
-
-
+```
 
