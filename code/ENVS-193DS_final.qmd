@@ -181,19 +181,43 @@ The two “seasons” refer to the years 2016 and 2019, representing the initial
 ```{r, cleaning nest_box data}
 
 nest_boxes_clean <- nest_boxes |> 
-  clean_names() |> 
+  clean_names() |>                           # Clean column names to consistent lowercase snake_case
   rename(
-    swift_parrot = sp,
-    common_starling = cs,
-    tree_martin = tm,
-    empty = e
+    swift_parrot = sp,                      # Rename 'sp' column to 'swift_parrot'
+    common_starling = cs,                   # Rename 'cs' to 'common_starling'
+    tree_martin = tm,                       # Rename 'tm' to 'tree_martin'
+    empty = e                              # Rename 'e' to 'empty'
   ) |> 
   mutate(
-    season = as.factor(season),   # make season a factor
-    season = fct_relevel(season, "2016"), # reorder levels if needed
-    swift_parrot = as.integer(swift_parrot) # ensure response is integer 0/1
+    season = as.factor(season),             # Convert 'season' to a factor (categorical)
+    season = fct_relevel(season, "2016"),  # Set '2016' as the reference level in 'season'
+    swift_parrot = as.integer(swift_parrot) # Convert 'swift_parrot' to integer (0/1 response)
   ) |> 
-  select(swift_parrot, season, edge_distance)
+  select(swift_parrot, season, edge_distance) # Keep only the columns needed for modeling
+
+```
+
+```{r, fitting nest_box models}
+
+# Null model: predicts Swift Parrot occupancy without any predictors (intercept only)
+model0 <- glm(swift_parrot ~ 1, 
+              data = nest_boxes_clean, 
+              family = "binomial")
+
+# Saturated model: predicts Swift Parrot occupancy using both season and edge distance
+model1 <- glm(swift_parrot ~ season + edge_distance, 
+              data = nest_boxes_clean, 
+              family = "binomial")
+
+# Model with season only: predicts Swift Parrot occupancy using season as predictor
+model2 <- glm(swift_parrot ~ season, 
+              data = nest_boxes_clean, 
+              family = "binomial")
+
+# Model with edge distance only: predicts Swift Parrot occupancy using edge distance as predictor
+model3 <- glm(swift_parrot ~ edge_distance, 
+              data = nest_boxes_clean, 
+              family = "binomial")
 
 ```
 
