@@ -11,16 +11,18 @@ format: html
 
 # --- necessary packages (possibly more) ---
 
-library(tidyverse)   # General data manipulation and visualization
-library(here)        # Simplifies file path management
-library(janitor)     # Helpful functions to clean data frames
+library(tidyverse)   # Basic necessity
+library(here)        # File path management
+library(janitor)     # Cleans names
 library(readxl)      # Read Excel files
-library(scales)      # Customize axis labels in plots
-library(ggeffects)   # Generate model predictions for plotting
-library(flextable)   # Create polished tables for reports
+library(scales)      # Customize axis labels
+library(ggeffects)   # For model predictions
+library(ggthemes)
+library(flextable)   # Creates tables 
 library(rstatix)     # Easy statistical tests
-library(effectsize)  # Calculate effect sizes for models
-library(lubridate)   # Simplifies working with dates
+library(effectsize)  # Calculate effect sizes
+library(lubridate)   # To work with dates
+library(paletteer)  # Color package
 
 # --- sea surface temperature data ---
 
@@ -32,19 +34,16 @@ sst <- read_csv(here("data", "sst_update2023.csv"))  # SST data CSV file
 
 ## a. Transparent statistical methods  
 
-**In part 1**, a linear regression test was likely used because both distance from headwater and nitrogen load are continuous variables. The p-value of 0.03 indicates that the slope of the relationship between distance and nitrogen load is significantly different from zero, meaning there is a statistically significant association between these variables. **In part 2**, average nitrogen loads across five different sources (urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands), which suggests they used a one-way ANOVA, the standard method for comparing means across multiple categorical groups. The p-value of 0.02 indicates at least one group mean differs significantly from the others.  
+**In part 2**, average nitrogen loads across five different sources (urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands), which suggests they used a one-way ANOVA, the standard method for comparing means across multiple categorical groups. The p-value of 0.02 indicates at least one group mean differs significantly from the others.  
 
 Because no other details were provided, these are the most likely tests based on the language and p-values reported.  
 
 ## b. More information needed  
 
-The test in part 2 looks like an ANOVA, which is good for comparing nitrogen load across sources. But to give more context, my co-worker should add these two things:
+The test in part 2 looks like an ANOVA, which is good for comparing nitrogen load across sources. But to give more context, these could be added:
 
 1. **Post-hoc test (like Tukey’s HSD)**. ANOVA tells us that at least one group is different, but not which ones. A post-hoc test helps identify which specific sources differ. 
 
-2. **Assumptions checks (like Shapiro-Wilk for normality  and Levene’s test for equal variance)**. ANOVA assumes the nitrogen load data is normally distributed within each group and that the variances are similar. Checking this helps make sure the ANOVA results are valid. If the assumptions aren’t met, a different test like Kruskal-Wallis might be better.
-
-Adding these steps would improve the strength of the conclusions and lower the chance of drawing the wrong conclusions from the data.
 
 ## c. Suggestions for rewriting 
 
@@ -54,6 +53,8 @@ Adding these steps would improve the strength of the conclusions and lower the c
 
 
 # Problem 2
+
+## a. Cleaning and summarizing
 
 Below you can find code to clean and summarize the 'sst' data set:
 
@@ -75,9 +76,9 @@ sst_clean <- sst |> # new df using sst data
     year = factor(format(date, "%Y"), levels = as.character(2018:2023)),  # Year as factor
     month = factor(format(date, "%b"), levels = month.abb, ordered = TRUE)  # Ordered month names
   ) |>
- drop_na() |>  # Remove rows with any missing values
+ drop_na() |>  # Remove rows with na
 
-  group_by(year, month) |>  # Group data by year and month
+  group_by(year, month) |>  # Group by year and month
 
   summarise(
     mean_monthly_sst = mean(temp),  # Calculate mean temp for each group
@@ -89,13 +90,52 @@ sst_clean <- sst |> # new df using sst data
 
 ```{r data structure}
 
-slice_sample(
+slice_sample(   # Preview n=5 rows of new df
   sst_clean,
   n = 5)
 
-str(sst_clean)
+str(sst_clean) # View structure of new df
 
+```
+
+## b. Visualize the data
+
+
+```{r line plot, warning=FALSE, error=FALSE}
+
+ggplot(sst_clean, aes(x = month, y = mean_monthly_sst, group = factor(year), color = factor(year))) +
+  geom_line(size = 0.8) +  # Add lines 
+  geom_point() +  # Add points
+  scale_color_paletteer_d("colRoz::sky", name = "Year") +  #  Discrete palette with gradient-like blue tones by year
+      # Axes labels
+  labs(
+    y = "Mean monthly sea surface temperature (°C)",  # Y-axis label
+    x = "Month"  # X-axis label
+  ) +
+
+  # Apply a clean black-and-white theme and customize appearance
+  theme_bw(base_size = 12) +  # Use a simple, readable theme
+  theme(
+    panel.grid = element_blank(),  # Remove default gridlines
+    legend.position = c(0.1, 0.75),  # Position legend inside plot
+    axis.title.x = element_text(size = 14),  # Larger x-axis title
+    axis.title.y = element_text(size = 14)   # Larger y-axis title
+  )
 
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
