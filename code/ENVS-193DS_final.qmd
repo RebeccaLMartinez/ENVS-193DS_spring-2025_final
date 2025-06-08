@@ -7,6 +7,7 @@ format:
     toc: true 
     warning: false 
     message: false 
+    error: false
 ---
 
 💻 [**GitHub Repository**](https://github.com/RebeccaLMartinez/ENVS-193DS_spring-2025_final)
@@ -220,4 +221,29 @@ model3 <- glm(swift_parrot ~ edge_distance,
               family = "binomial")
 
 ```
+
+## f. Check the diagnostics
+
+```{r diagnostics check all models}
+
+# Model 0 (null model with no predictors)
+sim_res0 <- simulateResiduals(fittedModel = model0)   # simulate residuals for null model
+plot(sim_res0)                                        # plot diagnostics for null model
+
+# Model 1 (season + edge_distance)
+sim_res1 <- simulateResiduals(fittedModel = model1)   # simulate residuals for full model
+plot(sim_res1)                                        # plot diagnostics for full model
+
+# Model 2 (season only)
+sim_res2 <- simulateResiduals(fittedModel = model2)   # simulate residuals for season-only model
+plot(sim_res2)                                        # plot diagnostics for season-only model
+
+# Model 3 (edge_distance only)
+sim_res3 <- simulateResiduals(fittedModel = model3)   # simulate residuals for edge_distance-only model
+plot(sim_res3)                                        # plot diagnostics for edge_distance-only model
+
+```
+
+
+
 
