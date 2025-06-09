@@ -251,14 +251,13 @@ plot(sim_res3)                                        # plot diagnostics for edg
 ```{r AIC}
 
 # Calculate AIC for each model
-aic_values <- AIC(model0,
+model_aic <- AIC(model0,
                   model1, 
                   model2, 
                   model3)
 
 # Print AIC table sorted by AIC (lowest first)
-aic_values <- aic_values[order(aic_values$AIC), ]
-print(aic_values)
+model_aic
 
 ```
 
@@ -273,5 +272,51 @@ summary(model1)
 
 The best model, based on Akaike’s Information Criterion (AIC), includes both season and distance from the forest edge (model1) as predictors of Swift Parrot nest box occupancy. This model provides the best balance of signal (meaningful information) to noise (random variation).
 
+
+## Visualize the model predictions 
+
+```{r model prediction plots}
+
+
+
+model1_predictions <- ggpredict(model1, terms = c("edge_distance", "season"))
+
+
+print(model1_predictions)
+
+```
+
+
+## 6. Final figure
+
+```{r}
+
+ggplot(data = model1_predictions,
+       aes(x = x, 
+           y = predicted, 
+           color = group, 
+           fill = group)) +
+  geom_line(size = 1) +
+  
+  geom_ribbon(aes(ymin = conf.low,
+                  ymax = conf.high), 
+              alpha = 0.2, 
+              color = NA) +
+  labs(x = "Distance from forest edge (m)", 
+       y = "Probability of swift parrot occupancy",
+       color = "Season", 
+       fill = "Season") +
+  theme_minimal() +
+  scale_color_manual(values = c("2016" = "turquoise3", "2019" = "coral3")) +
+  scale_fill_manual(values = c("2016" = "turquoise3", "2019" = "coral3")) +
+   # Remove gridlines for a cleaner look
+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+  
+
+```
 
 
