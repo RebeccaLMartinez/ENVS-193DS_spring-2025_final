@@ -22,14 +22,16 @@ library(janitor)     # Cleans names
 library(readxl)      # Read Excel files
 library(scales)      # Customize axis labels
 library(ggeffects)   # For model predictions
-library(ggthemes)
+library(ggthemes)    # For additional themes
 library(flextable)   # Creates tables 
+library(gtsummary)   # Summary tables
 library(rstatix)     # Easy statistical tests
 library(effectsize)  # Calculate effect sizes
 library(lubridate)   # To work with dates
 library(paletteer)   # Color package
-library(DHARMa)
-library(MuMIn)  # model selection (be advisedL Warning message: package ‘MuMIn’ was built under R version 4.3.3 )
+library(DHARMa)      # Modeling
+library(modelsummary)# Modeling multiple models
+library(MuMIn)       # Model selection (be advisedL Warning message: package ‘MuMIn’ was built under R version 4.3.3 )
 
 
 # --- sea surface temperature data ---
@@ -242,10 +244,12 @@ plot(sim_res2)                                        # plot diagnostics for sea
 sim_res3 <- simulateResiduals(fittedModel = model3)   # simulate residuals for edge_distance-only model
 plot(sim_res3)                                        # plot diagnostics for edge_distance-only model
 
+
+
 ```
 
 
-## e. Select the best model
+## g. Select the best model
 
 
 ```{r AIC}
@@ -256,15 +260,8 @@ model_aic <- AIC(model0,
                   model2, 
                   model3)
 
-# Print AIC table sorted by AIC (lowest first)
+# AIC table
 model_aic
-
-```
-
-```{r summary or model1}
-
-# Show summary of best model
-summary(model1)
 
 ```
 
@@ -273,50 +270,104 @@ summary(model1)
 The best model, based on Akaike’s Information Criterion (AIC), includes both season and distance from the forest edge (model1) as predictors of Swift Parrot nest box occupancy. This model provides the best balance of signal (meaningful information) to noise (random variation).
 
 
-## Visualize the model predictions 
+## h. Visualize the model predictions 
 
-```{r model prediction plots}
+```{r model prediction plot}
 
 
-
+# Generate predicted values and confidence intervals from model1
 model1_predictions <- ggpredict(model1, terms = c("edge_distance", "season"))
 
+# View predictions data frame to inspect its structure and values
 
-print(model1_predictions)
+model1_predictions
 
 ```
 
 
-## 6. Final figure
+
+
 
 ```{r}
 
-ggplot(data = model1_predictions,
-       aes(x = x, 
-           y = predicted, 
-           color = group, 
-           fill = group)) +
-  geom_line(size = 1) +
+ggplot(data = model1_predictions,  # Use model predictions data frame
+       aes(x = x,                  # x-axis: distance from forest edge
+           y = predicted,          # y-axis: predicted occupancy probability
+           color = group,          # Line color mapped to season (group)
+           fill = group)) +        # Fill color (for ribbons) mapped to season
+
+  # Add semi-transparent points at predicted values
+  geom_point(size = 2, alpha = 0.4) +  
   
-  geom_ribbon(aes(ymin = conf.low,
-                  ymax = conf.high), 
-              alpha = 0.2, 
-              color = NA) +
-  labs(x = "Distance from forest edge (m)", 
-       y = "Probability of swift parrot occupancy",
-       color = "Season", 
-       fill = "Season") +
-  theme_minimal() +
-  scale_color_manual(values = c("2016" = "turquoise3", "2019" = "coral3")) +
-  scale_fill_manual(values = c("2016" = "turquoise3", "2019" = "coral3")) +
-   # Remove gridlines for a cleaner look
-  theme_classic() +
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank()
-  )
+  # Add shaded confidence interval ribbon for each season
+  geom_ribbon(data = model1_predictions,  
+              aes(ymin = conf.low, ymax = conf.high),  # Confidence bounds
+              alpha = 0.4, color = NA) +  # No border around ribbons
   
+  # Add prediction lines for each season
+  geom_line(size = 0.7) +  
+
+  # Add axis labels and legend titles
+  labs(x = "Distance from forest edge (m)",   
+       y = "Probability of swift parrot occupancy",  
+       color = "Season",                      
+       fill = "Season") +                     
+
+  # Manually set custom colors for seasons (to match paper styling)
+  scale_color_manual(values = c("2016" = "salmon", "2019" = "slateblue1")) +  
+  scale_fill_manual(values = c("2016" = "salmon", "2019" = "slateblue1")) +   
+
+  # Set y-axis limits and create evenly spaced tick marks
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +  
+
+  # Use a clean, minimal theme without gridlines
+  theme_classic()
+
+ 
+```
+
+## i. Write a caption for your figure.
+
+**Figure 1.** Predicted probabilities and 95% confidence intervals from the best model of nest box occupancy by Swift Parrots, the target species of the restoration effort. The plot shows how the probability of occupancy changes with distance from the forest edge and between study years (2016 and 2019). Occupancy probability decreases with increasing distance from the forest edge and from 2016 to 2019.
+*Data source:* Stojanovic et al. (2021), Restoration Ecology (DOI: 10.1111/rec.13319)
+
+
+## j. Calculate model predictions
+
+```{r}
+
+
+# Predicted probabilities at 0 m and 900 m for each season
+
+predictions_specific <- ggpredict(model1, 
+                                  terms = c("edge_distance [0,900]", "season"))
+
+ 
+preds_table <- as.data.frame(predictions_specific) |> # Convert to df
+ rename(           # Rename columns
+    `Edge Distance (m)` = x,
+    Season = group,
+    `Predicted Probability` = predicted,
+    'Standard Error' = std.error,
+    `95% CI Lower` = conf.low,
+    `95% CI Upper` = conf.high
+  ) |> 
+   mutate(across(where(is.numeric), ~ round(.x, 3)))  # Round to 3 decimals
+
+
+# Create flextable 
+
+flextable(preds_table) |>
+  set_caption("Table 1. Predicted probabilities of Swift Parrot nest box occupancy at 0 m and 900 m from forest edge by season.") |>  # Add title
+  autofit() # Fits nicer
 
 ```
+
+## k. Intepret your results
+
+Swift Parrots are more likely to occupy nest boxes located closer to the forest edge and showed reduced occupancy in 2019 compared to 2016 (see *Figure 1* and *Table 1*). For every 1-meter increase in distance from the forest edge, the odds of occupancy decrease by a factor of 0.998 (95% CI [1.00, 1.00], *p* < 0.001). At 0 meters, the predicted probability of occupancy was 0.481 in 2016 and 0.298 in 2019, decreasing to 0.125 and 0.061, respectively, at 900 meters.
+
+These patterns suggest that the declining occupancy of Swift Parrots may be driven by increasing competition for nesting sites, particularly from invasive species such as starlings and tree martins, consistent with previous findings reported in the study.
+
 
 
