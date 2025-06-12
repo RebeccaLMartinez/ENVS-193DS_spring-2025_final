@@ -416,7 +416,7 @@ ggplot(data = model1_predictions,  # Use model predictions data frame
 ## i. Write a caption for your figure.
 
 **Figure 1.** Predicted probabilities and 95% confidence intervals from the best model of nest box occupancy by Swift Parrots, the target species of the restoration effort. The plot shows how the probability of occupancy changes with distance from the forest edge and between study seasons. Nest box occupancy was significantly lower in 2019 compared to 2016, with boxes in 2019 having 54% lower odds of occupancy (95% CI [0.23, 0.89], *p* = 0.022).
-*Data source:* Stojanovic et al. (2021), Restoration Ecology (DOI: 10.1111/rec.13319)
+Data source: Stojanovic et al. (2021), *Restoration Ecology* [DOI: 10.1111/rec.13319](DOI: 10.1111/rec.13319)
 
 
 ## j. Calculate model predictions
