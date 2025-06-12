@@ -5,16 +5,19 @@ date: "June 12, 2025"
 format:
   html: 
     toc: true 
+    toc-floating: true
     warning: false 
     message: false 
     error: false
 ---
 
-💻 [**GitHub Repository**](https://github.com/RebeccaLMartinez/ENVS-193DS_spring-2025_final)
+[**Veiw GitHub Repository**](https://github.com/RebeccaLMartinez/ENVS-193DS_spring-2025_final)
+
+---
 
 ```{r setup,  message=FALSE, warning=FALSE, error=FALSE}
 
-# --- necessary packages (possibly more) ---
+# --- necessary packages (possibly extra) ---
 
 library(tidyverse)   # Basic necessity
 library(here)        # File path management
@@ -31,54 +34,50 @@ library(lubridate)   # To work with dates
 library(paletteer)   # Color package
 library(DHARMa)      # Modeling
 library(modelsummary)# Modeling multiple models
-library(MuMIn)       # Model selection (be advisedL Warning message: package ‘MuMIn’ was built under R version 4.3.3 )
+library(MuMIn)       # Model selection
 
 
-# --- sea surface temperature data ---
+# --- sea surface temperature data (problem 2) ---
 
-sst <- read_csv(here("data", "sst_update2023.csv"))  # SST data CSV file
+sst <- read_csv(here("data", "sst_update2023.csv"))  
 
-str(sst)
 
-# --- 
+
+# --- Swift Parrot data (problem 3) ---
 
 nest_boxes <- read_csv(here("data", "occdist.csv"))
 
-str(nest_boxes)
-slice(nest_boxes)
-head(nest_boxes)
 ```
 
 # Problem 1. Research writing 
 
 ## a. Transparent statistical methods  
 
-**In part 2**, average nitrogen loads across five different sources (urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands), which suggests they used a one-way ANOVA, the standard method for comparing means across multiple categorical groups. The p-value of 0.02 indicates at least one group mean differs significantly from the others.  
+**In part 1**, they tested the null hypothesis of “no correlation” between distance from headwater (km) and nitrogen load (kg/year), which suggests they used Pearson’s correlation. When used along, this test can test if there is a correlation between two continuous variables by whether the correlation coefficient (r) differs from zero. 
 
-Because no other details were provided, these are the most likely tests based on the language and p-values reported.  
+**In part 2**, they compared average nitrogen loads across five sources (urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands). Since they rejected the null hypothesis that all source means are equal and reported a p-value of 0.02, they likely used a one-way ANOVA, which is appropriate for testing differences in means across multiple categorical groups.
+
 
 ## b. More information needed  
 
-The test in part 2 looks like an ANOVA, which is good for comparing nitrogen load across sources. But to give more context, these could be added:
+1. Two additional tests should be run: Levene’s Test for Homogeneity of Variances to check if nitrogen load variation is similar across the sources (important because ANOVA assumes equal variances), and Shapiro-Wilk Test for Normality of Residuals to confirm if residuals are normally distributed (another key ANOVA assumption).
 
-1. **Post-hoc test (like Tukey’s HSD)**. ANOVA tells us that at least one group is different, but not which ones. A post-hoc test helps identify which specific sources differ. 
-
+2. The report should also include more detailed statistics like the F value, degrees of freedom, effect size ($\eta^2$), and significance level ($\alpha$) for the ANOVA. For Levene’s and Shapiro-Wilk tests, the test statistics and p-values should be reported. This information adds transparency and helps readers assess the reliability of the results.
 
 ## c. Suggestions for rewriting 
 
+**Part 1**  
+A correlation was found between distance from the headwater (km) and annual total nitrogen load (kg year⁻¹), suggesting that nitrogen load changes with distance (*Pearson’s correlation*: r = correlation coefficient, t(df) = t-value, p = 0.03, CI[lower,upper], $\alpha$ = significance level).
 
 
-
-
+**Part 2**  
+Average nitrogen load (kg.yr) differed significantly among sources, including urban land, atmospheric deposition, fertilizer, wastewater treatment, and grasslands  (*one-way ANOVA*, F(df₁, df₂) = F-value, p = 0.02, $\theta^2$ = effect size, $\alpha$ = significance level). Assumptions of homogeneity of variances and normality were met (*Levene’s test*, F(df₁, df₂) = F-statistic, p > p-value; *Shapiro-Wilk test*, W = test statistic, p > p-value).
 
 # Problem 2
 
 ## a. Cleaning and summarizing
 
-Below you can find code to clean and summarize the 'sst' data set:
-
 ```{r cleaning sst data}
-
 
 sst_clean <- sst |> # new df using sst data
   # Convert data types
@@ -153,9 +152,100 @@ ggplot(sst_clean, aes(x = month, y = mean_monthly_sst, group = factor(year), col
 
 2. Is there a simpler model that explains Swift Parrot nest box occupancy, and if so, what is it?
 
+
+```{r exploratory data, echo=FALSE}
+
+# Clean and prepare the data
+total_occupancy <- nest_boxes |> 
+  clean_names() |>                  # Clean column names (snake_case)
+  rename(swift_parrot = sp) |>      # Rename 'sp' to 'swift_parrot'
+  mutate(
+    season = as.factor(season),     # Convert 'season' to a factor
+    swift_parrot = as.integer(swift_parrot) # Convert occupancy to integer (0 or 1)
+  ) |>
+  filter(swift_parrot == 1) |>    # Keep only occupied boxes
+  group_by(season) |>             # Group data by season
+  summarise(total = sum(swift_parrot), .groups = "drop")  # Sum occupied boxes per season
+
+
+# Totals by season
+ggplot(total_occupancy, aes(x = season, y = total, fill = season)) +
+  geom_col() +                                       # Create bar plot for totals
+  scale_fill_manual(values = c("2016" = "steelblue", "2019" = "orange4")) + # custom colors
+  scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +  # Y-axis starts at zero, no expansion below 0
+  labs(
+    x = "Season",                                    # X-axis label
+    y = "Total Swift Parrot Occupied Boxes",        # Y-axis label
+    title = "Swift Parrot Nest Box Occupancy by Season"  # Plot title
+  ) +
+  theme_classic() +                                  # Clean classic theme
+  theme(
+    legend.position = "none",                        # Hide legend (colors shown on x-axis)
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),  # Title style, centered
+    axis.title = element_text(face = "bold"),       # Bold axis titles
+    axis.text = element_text(size = 12)              # Axis tick text size
+  )
+
+
+# clean for edge dist
+
+edge_dist <- nest_boxes |> 
+  clean_names() |>                                  # Clean column names again
+  rename(swift_parrot = sp) |>                      # Rename for clarity
+  mutate(
+    season = as.factor(season),                      # Season as factor
+    swift_parrot = as.integer(swift_parrot)          # Occupancy as integer
+  ) |>  
+  select(swift_parrot, season, edge_distance)  |>
+  filter(swift_parrot == 1)# Select relevant columns
+
+
+# Decide on bins with rice rule
+
+n <- edge_dist |> 
+  filter(swift_parrot == 1) |>        # Only occupied boxes
+  nrow()                       # Count number of rows (occupied boxes)
+
+rice_bins <- ceiling(2 * n^(1/3))   # Calculate bins using Rice Rule (2 * n^(1/3))
+
+
+ggplot(edge_dist, aes(x = edge_distance, fill = season)) +         # Plot histogram of edge_distance colored by season
+  geom_histogram(
+    bins = rice_bins,                                              # Set number of bins using Rice Rule
+    color = "black"                                                # Black border around histogram bars
+  ) +
+  facet_wrap(~season) +                                            # Separate plots by season
+  scale_x_continuous(
+    breaks = seq(from = 0, to = 1000, by = 200)                    # Set x-axis ticks every 200 meters
+  ) +
+  scale_y_continuous(
+    expand = c(0, 0)                                               # Start y-axis at 0 with no padding
+  ) +
+  scale_fill_manual(
+    values = c("2016" = "steelblue", "2019" = "orange4")             # Custom fill colors for seasons
+  ) +
+  labs(
+    x = "Distance from Forest Edge (m)",                           # X-axis label
+    y = "Count of Occupied Nest Boxes",                            # Y-axis label
+    title = "Distribution of Occupied Nest Boxes by Edge Distance and Season"  # Plot title
+  ) +
+  theme_base() +                                                   # Use a clean minimal theme
+  theme(
+    axis.text = element_text(size = 14),                           # Increase size of axis text
+    axis.text.x = element_text(angle = 90, hjust = 1),             # Rotate x-axis labels vertically
+    axis.title = element_text(size = 16),                          # Increase size of axis titles
+    plot.title = element_text(size = 18, face = "bold"),           # Bold and enlarge plot title
+    legend.title = element_blank()                                 # Remove legend title
+  )
+
+
+```
+
+
+
 ## a. Response variable 
 
-A '1' indicates that a nest box was occupied by a bird species during the observation period, meaning there was evidence such as adults, eggs, or nestlings. A '0' means the nest box was not occupied or showed no signs of nesting when checked.
+A `1` indicates that a nest box was occupied by a bird species during the observation period, meaning there was evidence such as adults, eggs, or nestlings. A `0` means the nest box was not occupied or showed no signs of nesting when checked.
 
 ## b. Purpose of study
 
@@ -187,13 +277,9 @@ nest_boxes_clean <- nest_boxes |>
   clean_names() |>                           # Clean column names to consistent lowercase snake_case
   rename(
     swift_parrot = sp,                      # Rename 'sp' column to 'swift_parrot'
-    common_starling = cs,                   # Rename 'cs' to 'common_starling'
-    tree_martin = tm,                       # Rename 'tm' to 'tree_martin'
-    empty = e                              # Rename 'e' to 'empty'
   ) |> 
   mutate(
     season = as.factor(season),             # Convert 'season' to a factor (categorical)
-    season = fct_relevel(season, "2016"),  # Set '2016' as the reference level in 'season'
     swift_parrot = as.integer(swift_parrot) # Convert 'swift_parrot' to integer (0/1 response)
   ) |> 
   select(swift_parrot, season, edge_distance) # Keep only the columns needed for modeling
@@ -222,27 +308,38 @@ model3 <- glm(swift_parrot ~ edge_distance,
               data = nest_boxes_clean, 
               family = "binomial")
 
+# To view more info:
+# model1 
+# summary(model1)
+# expo_tbl <- gtsummary::tbl_regression(model1,
+                         # exponentiate = TRUE)
+#as.data.frame(expo_tbl)
+
+
 ```
 
 ## f. Check the diagnostics
 
 ```{r diagnostics check all models}
 
+# simulate residuals
+# 
 # Model 0 (null model with no predictors)
-sim_res0 <- simulateResiduals(fittedModel = model0)   # simulate residuals for null model
-plot(sim_res0)                                        # plot diagnostics for null model
+sim_res0 <- simulateResiduals(fittedModel = model0) |>  
+plot()  
+
 
 # Model 1 (season + edge_distance)
-sim_res1 <- simulateResiduals(fittedModel = model1)   # simulate residuals for full model
-plot(sim_res1)                                        # plot diagnostics for full model
+sim_res1 <- simulateResiduals(fittedModel = model1)  |>  
+plot()                                       
 
 # Model 2 (season only)
-sim_res2 <- simulateResiduals(fittedModel = model2)   # simulate residuals for season-only model
-plot(sim_res2)                                        # plot diagnostics for season-only model
+sim_res2 <- simulateResiduals(fittedModel = model2)  |>  
+plot()                                       
 
 # Model 3 (edge_distance only)
-sim_res3 <- simulateResiduals(fittedModel = model3)   # simulate residuals for edge_distance-only model
-plot(sim_res3)                                        # plot diagnostics for edge_distance-only model
+sim_res3 <- simulateResiduals(fittedModel = model3) |>  
+plot()                                      
 
 
 
@@ -267,7 +364,7 @@ model_aic
 
 **Interpretation**
 
-The best model, based on Akaike’s Information Criterion (AIC), includes both season and distance from the forest edge (model1) as predictors of Swift Parrot nest box occupancy. This model provides the best balance of signal (meaningful information) to noise (random variation).
+The best model predicting Swift Parrot nest box occupancy includes both season and distance from the forest edge (binomial GLM, AIC = 226.21, $\alpha$ = 0.05). 
 
 
 ## h. Visualize the model predictions 
@@ -276,19 +373,10 @@ The best model, based on Akaike’s Information Criterion (AIC), includes both s
 
 
 # Generate predicted values and confidence intervals from model1
-model1_predictions <- ggpredict(model1, terms = c("edge_distance", "season"))
 
-# View predictions data frame to inspect its structure and values
-
-model1_predictions
-
-```
-
-
-
-
-
-```{r}
+model1_predictions <- ggpredict(model1, terms = 
+                                  c("edge_distance",
+                                    "season"))
 
 ggplot(data = model1_predictions,  # Use model predictions data frame
        aes(x = x,                  # x-axis: distance from forest edge
@@ -323,18 +411,17 @@ ggplot(data = model1_predictions,  # Use model predictions data frame
   # Use a clean, minimal theme without gridlines
   theme_classic()
 
- 
 ```
 
 ## i. Write a caption for your figure.
 
-**Figure 1.** Predicted probabilities and 95% confidence intervals from the best model of nest box occupancy by Swift Parrots, the target species of the restoration effort. The plot shows how the probability of occupancy changes with distance from the forest edge and between study years (2016 and 2019). Occupancy probability decreases with increasing distance from the forest edge and from 2016 to 2019.
+**Figure 1.** Predicted probabilities and 95% confidence intervals from the best model of nest box occupancy by Swift Parrots, the target species of the restoration effort. The plot shows how the probability of occupancy changes with distance from the forest edge and between study seasons. Nest box occupancy was significantly lower in 2019 compared to 2016, with boxes in 2019 having 54% lower odds of occupancy (95% CI [0.23, 0.89], *p* = 0.022). For every additional meter from the forest edge, the odds of occupancy decreased by about 0.2% (95% CI: [0.997,0.999], *p* < 0.001)
 *Data source:* Stojanovic et al. (2021), Restoration Ecology (DOI: 10.1111/rec.13319)
 
 
 ## j. Calculate model predictions
 
-```{r}
+```{r predictions at 0 and 900}
 
 
 # Predicted probabilities at 0 m and 900 m for each season
@@ -342,17 +429,18 @@ ggplot(data = model1_predictions,  # Use model predictions data frame
 predictions_specific <- ggpredict(model1, 
                                   terms = c("edge_distance [0,900]", "season"))
 
- 
+
 preds_table <- as.data.frame(predictions_specific) |> # Convert to df
  rename(           # Rename columns
     `Edge Distance (m)` = x,
     Season = group,
     `Predicted Probability` = predicted,
-    'Standard Error' = std.error,
+    `Standard Error` = std.error,
     `95% CI Lower` = conf.low,
     `95% CI Upper` = conf.high
   ) |> 
    mutate(across(where(is.numeric), ~ round(.x, 3)))  # Round to 3 decimals
+
 
 
 # Create flextable 
@@ -361,13 +449,40 @@ flextable(preds_table) |>
   set_caption("Table 1. Predicted probabilities of Swift Parrot nest box occupancy at 0 m and 900 m from forest edge by season.") |>  # Add title
   autofit() # Fits nicer
 
+# kinda like this better:
+predictions_specific
+
+
 ```
 
 ## k. Intepret your results
 
-Swift Parrots are more likely to occupy nest boxes located closer to the forest edge and showed reduced occupancy in 2019 compared to 2016 (see *Figure 1* and *Table 1*). For every 1-meter increase in distance from the forest edge, the odds of occupancy decrease by a factor of 0.998 (95% CI [1.00, 1.00], *p* < 0.001). At 0 meters, the predicted probability of occupancy was 0.481 in 2016 and 0.298 in 2019, decreasing to 0.125 and 0.061, respectively, at 900 meters.
+Swift Parrots are more likely to occupy nest boxes near the forest edge, and overall occupancy declined from 2016 to 2019 (Figure 1, Table 1). Nest boxes in 2019 had lower odds of occupancy by a factor of 0.46 (95% CI: [0.23, 0.89], p = 0.022). 
 
-These patterns suggest that the declining occupancy of Swift Parrots may be driven by increasing competition for nesting sites, particularly from invasive species such as starlings and tree martins, consistent with previous findings reported in the study.
+For every 1-meter increase in distance from the forest edge, the odds of occupancy decreased by a factor of 0.998 (95% CI: [0.997, 0.999], p < 0.001). In 2016, predicted occupancy dropped from 48% at the forest edge to 12% at 900 meters and in 2019, it dropped from 30% to just 6%. 
 
+These patterns suggest that declining occupancy may be driven by competition for nest sites from invasive species such as starlings and tree martins.
 
+# 4. Affective and exploratory visualizations 
 
+## a. Comparing visualizations
+
+**How are the visualizations different from each other in the way you have represented your data** 
+
+In Homework 2, I used a boxplot and a line graph to explore my data, but these were not ideal choices for representing categorical variables. In contrast, the affective visualization in Homework 3 used a blinking light grid to visually show counts of service calls and whether lights were working or not, which made the patterns much clearer.
+
+**What similarities do you see between all your visualizations?**  
+
+All of my visualizations focused on the relationship between the service light’s working status and whether help was truly needed. They all aimed to highlight the issue of unnecessary calls and equipment failure, looking for patterns in help requests across conditions.
+
+**What patterns do you see in each visualization? Are these different between visualizations? If so, why? If not, why not?**
+
+In both Homework 2 and 3, I observed that false service calls were more common when the light was broken. While the visual choices in Homework 2 didn’t clearly show this pattern, the same relationship was still present. Homework 3’s stacked bar chart and blinking light grid were more effective at highlighting the high proportion of unnecessary calls when the lights were broken. The difference came down to how well each visualization matched the data type.
+
+**What kinds of feedback did you get during week 9 in workshop or from the instructors? How did you implement or try those suggestions? If you tried and kept those suggestions, explain how and why; if not, explain why not.**  
+
+My peers pointed out confusion about what the gray circles in my blinking light grid represented, since they were redundant with the red question marks used for unknown light status. I revised the visual by removing the gray circles and keeping only the red question marks to more clearly indicate unknown status and reduce visual clutter.
+
+# b. Sharing your affective visualization 
+
+*In-class.*
