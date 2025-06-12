@@ -51,6 +51,6 @@ ENVS-193DS-final/
 ## Rendered Output
 
 View the final rendered HTML document here:  
-🔗 [ENVS-193DS-final.html](./code/ENVS-193DS-final.html)
+🔗 [ENVS-193DS-final.html](https://rebeccalmartinez.github.io/ENVS-193DS_spring-2025_final/code/ENVS-193DS_final.html)
 
 ---
