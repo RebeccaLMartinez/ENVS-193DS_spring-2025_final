@@ -11,9 +11,13 @@ format:
     error: false
 ---
 
+
+
 [**Veiw GitHub Repository**](https://github.com/RebeccaLMartinez/ENVS-193DS_spring-2025_final)
 
 ---
+
+
 
 ```{r setup,  message=FALSE, warning=FALSE, error=FALSE}
 
@@ -49,6 +53,8 @@ nest_boxes <- read_csv(here("data", "occdist.csv"))
 
 ```
 
+
+
 # Problem 1. Research writing 
 
 ## a. Transparent statistical methods  
@@ -76,6 +82,8 @@ Average nitrogen load (kg.yr) differed significantly among sources, including ur
 # Problem 2
 
 ## a. Cleaning and summarizing
+
+
 
 ```{r cleaning sst data}
 
@@ -105,7 +113,6 @@ sst_clean <- sst |> # new df using sst data
 
 ```
 
-
 ```{r data structure}
 
 slice_sample(   # Preview n=5 rows of new df
@@ -116,7 +123,11 @@ str(sst_clean) # View structure of new df
 
 ```
 
+
+
 ## b. Visualize the data
+
+
 
 
 ```{r line plot, warning=FALSE, error=FALSE}
@@ -144,6 +155,8 @@ ggplot(sst_clean, aes(x = month, y = mean_monthly_sst, group = factor(year), col
 ```
 
 
+
+
 # Problem 3. Data analysis
 
 **Research Questions**
@@ -151,6 +164,8 @@ ggplot(sst_clean, aes(x = month, y = mean_monthly_sst, group = factor(year), col
 1. How do year (2016 or 2019) and distance from forest edge predict Swift Parrot (Lathamus discolor) nest box occupancy?
 
 2. Is there a simpler model that explains Swift Parrot nest box occupancy, and if so, what is it?
+
+
 
 
 ```{r exploratory data, echo=FALSE}
@@ -243,6 +258,8 @@ ggplot(edge_dist, aes(x = edge_distance, fill = season)) +         # Plot histog
 
 
 
+
+
 ## a. Response variable 
 
 A `1` indicates that a nest box was occupied by a bird species during the observation period, meaning there was evidence such as adults, eggs, or nestlings. A `0` means the nest box was not occupied or showed no signs of nesting when checked.
@@ -270,6 +287,8 @@ The two “seasons” refer to the years 2016 and 2019, representing the initial
 
 
 ## e. Run the models 
+
+
 
 ```{r, cleaning nest_box data}
 
@@ -318,7 +337,11 @@ model3 <- glm(swift_parrot ~ edge_distance,
 
 ```
 
+
+
 ## f. Check the diagnostics
+
+
 
 ```{r diagnostics check all models}
 
@@ -346,7 +369,11 @@ plot()
 ```
 
 
+
+
 ## g. Select the best model
+
+
 
 
 ```{r AIC}
@@ -362,12 +389,16 @@ model_aic
 
 ```
 
+
+
 **Interpretation**
 
 The best model predicting Swift Parrot nest box occupancy includes both season and distance from the forest edge (binomial GLM, AIC = 226.21, $\alpha$ = 0.05). 
 
 
 ## h. Visualize the model predictions 
+
+
 
 ```{r model prediction plot}
 
@@ -413,6 +444,8 @@ ggplot(data = model1_predictions,  # Use model predictions data frame
 
 ```
 
+
+
 ## i. Write a caption for your figure.
 
 **Figure 1.** Predicted probabilities and 95% confidence intervals from the best model of nest box occupancy by Swift Parrots, the target species of the restoration effort. The plot shows how the probability of occupancy changes with distance from the forest edge and between study seasons. Nest box occupancy was significantly lower in 2019 compared to 2016, with boxes in 2019 having 54% lower odds of occupancy (95% CI [0.23, 0.89], *p* = 0.022).
@@ -420,6 +453,8 @@ Data source: Stojanovic et al. (2021), *Restoration Ecology* [DOI: 10.1111/rec.1
 
 
 ## j. Calculate model predictions
+
+
 
 ```{r predictions at 0 and 900}
 
@@ -455,6 +490,8 @@ predictions_specific
 
 ```
 
+
+
 ## k. Intepret your results
 
 Swift Parrots are more likely to occupy nest boxes near the forest edge, and overall occupancy declined from 2016 to 2019 (Figure 1, Table 1). Nest boxes in 2019 had lower odds of occupancy by a factor of 0.46 (95% CI: [0.23, 0.89], p = 0.022). 
@@ -482,4 +519,5 @@ In both Homework 2 and 3, I observed that false service calls were more common w
 **What kinds of feedback did you get during week 9 in workshop or from the instructors? How did you implement or try those suggestions? If you tried and kept those suggestions, explain how and why; if not, explain why not.**  
 
 My peers pointed out confusion about what the gray circles in my blinking light grid represented, since they were redundant with the red question marks used for unknown light status. I revised the visual by removing the gray circles and keeping only the red question marks to more clearly indicate unknown status and reduce visual clutter.
+
 
