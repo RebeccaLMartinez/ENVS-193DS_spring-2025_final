@@ -483,6 +483,3 @@ In both Homework 2 and 3, I observed that false service calls were more common w
 
 My peers pointed out confusion about what the gray circles in my blinking light grid represented, since they were redundant with the red question marks used for unknown light status. I revised the visual by removing the gray circles and keeping only the red question marks to more clearly indicate unknown status and reduce visual clutter.
 
-# b. Sharing your affective visualization 
-
-*In-class.*
